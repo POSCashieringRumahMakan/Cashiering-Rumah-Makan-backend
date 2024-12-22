@@ -25,7 +25,7 @@ class Member
         $query = "SELECT * FROM member WHERE email = ?";
         $stmt = $pdo->prepare($query);
         $stmt->execute([$email]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);  // Mengembalikan data user jika ditemukan
+        return $stmt->fetch(PDO::FETCH_ASSOC); // Mengembalikan data user jika ditemukan
     }
 
     // Verifikasi login (email dan password)
@@ -39,9 +39,9 @@ class Member
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user['password'])) {
-            return $user;  // Mengembalikan data user jika password valid
+            return $user; // Mengembalikan data user jika password valid
         }
-        return false;  // Jika login gagal
+        return false; // Jika login gagal
     }
 }
 ?>
