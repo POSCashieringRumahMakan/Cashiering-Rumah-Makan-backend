@@ -1,5 +1,4 @@
 <?php
-
 $host = 'localhost';   // Ganti dengan host database Anda
 $dbname = 'posrumah_makan';  // Ganti dengan nama database Anda
 $username = 'root';     // Ganti dengan username database Anda
@@ -12,5 +11,4 @@ try {
 } catch (PDOException $e) {
     die("Koneksi gagal: " . $e->getMessage());
 }
-
 ?>
