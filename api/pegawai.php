@@ -9,25 +9,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-require_once '../models/category.php';
+require_once '../models/pegawai.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-$category = new Category();
+$pegawai = new Pegawai();
 
 if ($method === 'POST') {
-    // Tambah kategori
+    // Tambah pegawai
     $data = json_decode(file_get_contents("php://input"));
 
-    if (empty($data->jenis_kategori) || empty($data->nama_kategori)) {
+    if (empty($data->nama) || empty($data->jabatan) || empty($data->email) || empty($data->no_telepon) || empty($data->status)) {
         echo json_encode(['message' => 'Semua field harus diisi!']);
         http_response_code(400);
         exit;
     }
 
-    if ($category->create($data->jenis_kategori, $data->nama_kategori)) {
-        echo json_encode(['message' => 'Kategori berhasil ditambahkan!']);
+    if ($pegawai->create($data->nama, $data->jabatan, $data->email, $data->no_telepon, $data->status)) {
+        echo json_encode(['message' => 'Pegawai berhasil ditambahkan!']);
         http_response_code(201);
     } else {
         echo json_encode(['message' => 'Terjadi kesalahan, coba lagi.']);
@@ -37,58 +37,61 @@ if ($method === 'POST') {
 
 if ($method === 'GET') {
     if ($id) {
-        // Ambil kategori berdasarkan ID
-        $result = $category->getById($id);
+        // Ambil pegawai berdasarkan ID
+        $result = $pegawai->getById($id);
         if ($result) {
             echo json_encode($result);
             http_response_code(200);
         } else {
-            echo json_encode(['message' => 'Kategori tidak ditemukan.']);
+            echo json_encode(['message' => 'Pegawai tidak ditemukan.']);
             http_response_code(404);
         }
     } else {
-        // Ambil semua kategori
-        echo json_encode($category->getAll());
+        // Ambil semua pegawai
+        echo json_encode($pegawai->getAll());
         http_response_code(200);
     }
 }
 
 if ($method === 'PUT') {
-    // Ubah kategori
+    // Ubah pegawai
     if ($id) {
         $data = json_decode(file_get_contents("php://input"));
 
-        if (empty($data->jenis_kategori) || empty($data->nama_kategori)) {
+        // Periksa apakah semua field sudah diisi
+        if (empty($data->nama) || empty($data->jabatan) || empty($data->email) || empty($data->no_telepon) || empty($data->status)) {
             echo json_encode(['message' => 'Semua field harus diisi!']);
             http_response_code(400);
             exit;
         }
 
-        if ($category->update($id, $data->jenis_kategori, $data->nama_kategori)) {
-            echo json_encode(['message' => 'Kategori berhasil diperbarui!']);
+        // Cek apakah data pegawai berhasil diperbarui
+        if ($pegawai->update($id, $data->nama, $data->jabatan, $data->email, $data->no_telepon, $data->status)) {
+            echo json_encode(['message' => 'Pegawai berhasil diperbarui!']);
             http_response_code(200);
         } else {
             echo json_encode(['message' => 'Terjadi kesalahan, coba lagi.']);
             http_response_code(500);
         }
     } else {
-        echo json_encode(['message' => 'ID kategori tidak ditemukan.']);
+        echo json_encode(['message' => 'ID pegawai tidak ditemukan.']);
         http_response_code(400);
     }
 }
 
+
 if ($method === 'DELETE') {
-    // Hapus kategori
+    // Hapus pegawai
     if ($id) {
-        if ($category->delete($id)) {
-            echo json_encode(['message' => 'Kategori berhasil dihapus!']);
+        if ($pegawai->delete($id)) {
+            echo json_encode(['message' => 'Pegawai berhasil dihapus!']);
             http_response_code(200);
         } else {
             echo json_encode(['message' => 'Terjadi kesalahan, coba lagi.']);
             http_response_code(500);
         }
     } else {
-        echo json_encode(['message' => 'ID kategori tidak ditemukan.']);
+        echo json_encode(['message' => 'ID pegawai tidak ditemukan.']);
         http_response_code(400);
     }
 }
