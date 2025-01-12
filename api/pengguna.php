@@ -2,6 +2,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header('Content-Type: application/json'); // Mengatur header sebagai JSON
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -44,8 +45,14 @@ if ($method === 'GET') {
             http_response_code(404);
         }
     } else {
-        echo json_encode($pengguna->getAll());
-        http_response_code(200);
+        $result = $pengguna->getAll();
+        if ($result) {
+            echo json_encode($result);
+            http_response_code(200);
+        } else {
+            echo json_encode(['message' => 'Tidak ada data pengguna.']);
+            http_response_code(404);
+        }
     }
 }
 
