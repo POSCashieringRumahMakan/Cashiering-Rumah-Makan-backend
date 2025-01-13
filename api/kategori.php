@@ -1,9 +1,9 @@
 <?php
-header("Content-Type: application/json"); // Pastikan header content-type adalah JSON
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
+// Tangani preflight request (OPTIONS)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
@@ -48,11 +48,48 @@ if ($method === 'GET') {
         }
     } else {
         // Ambil semua kategori
-        $result = $category->getAll(); // Ambil semua kategori
-        echo json_encode($result);
+        echo json_encode($category->getAll());
         http_response_code(200);
     }
 }
 
-// Jangan menambahkan teks atau pesan lain selain data JSON di sini
+if ($method === 'PUT') {
+    // Ubah kategori
+    if ($id) {
+        $data = json_decode(file_get_contents("php://input"));
+
+        if (empty($data->jenis_kategori) || empty($data->nama_kategori)) {
+            echo json_encode(['message' => 'Semua field harus diisi!']);
+            http_response_code(400);
+            exit;
+        }
+
+        if ($category->update($id, $data->jenis_kategori, $data->nama_kategori)) {
+            echo json_encode(['message' => 'Kategori berhasil diperbarui!']);
+            http_response_code(200);
+        } else {
+            echo json_encode(['message' => 'Terjadi kesalahan, coba lagi.']);
+            http_response_code(500);
+        }
+    } else {
+        echo json_encode(['message' => 'ID kategori tidak ditemukan.']);
+        http_response_code(400);
+    }
+}
+
+if ($method === 'DELETE') {
+    // Hapus kategori
+    if ($id) {
+        if ($category->delete($id)) {
+            echo json_encode(['message' => 'Kategori berhasil dihapus!']);
+            http_response_code(200);
+        } else {
+            echo json_encode(['message' => 'Terjadi kesalahan, coba lagi.']);
+            http_response_code(500);
+        }
+    } else {
+        echo json_encode(['message' => 'ID kategori tidak ditemukan.']);
+        http_response_code(400);
+    }
+}
 ?>
