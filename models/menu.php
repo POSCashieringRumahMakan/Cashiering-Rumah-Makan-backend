@@ -1,18 +1,17 @@
 <?php
-include 'db.php';
+require_once '../database/db.php';
 
 // Fungsi untuk mendapatkan semua produk
-default:
 function getProducts() {
     global $pdo;
-    $stmt = $pdo->query("SELECT * FROM produk");
+    $stmt = $pdo->query("SELECT * FROM menu");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // Fungsi untuk menambahkan produk baru
 function addProduct($nama, $kategori, $harga, $status) {
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO produk (nama, kategori, harga, status) VALUES (:nama, :kategori, :harga, :status)");
+    $stmt = $pdo->prepare("INSERT INTO menu (nama, kategori, harga, status) VALUES (:nama, :kategori, :harga, :status)");
     $stmt->execute([
         'nama' => $nama,
         'kategori' => $kategori,
@@ -24,7 +23,7 @@ function addProduct($nama, $kategori, $harga, $status) {
 // Fungsi untuk mengedit produk
 function updateProduct($id, $nama, $kategori, $harga, $status) {
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE produk SET nama = :nama, kategori = :kategori, harga = :harga, status = :status WHERE id = :id");
+    $stmt = $pdo->prepare("UPDATE menu SET nama = :nama, kategori = :kategori, harga = :harga, status = :status WHERE id = :id");
     $stmt->execute([
         'id' => $id,
         'nama' => $nama,
@@ -32,40 +31,31 @@ function updateProduct($id, $nama, $kategori, $harga, $status) {
         'harga' => $harga,
         'status' => $status
     ]);
+
+    // Mengembalikan true jika baris terpengaruh, false jika tidak
+    return $stmt->rowCount() > 0;
 }
+
 
 // Fungsi untuk menghapus produk
 function deleteProduct($id) {
     global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM produk WHERE id = :id");
-    $stmt->execute(['id' => $id]);
-}
 
-// Tangani permintaan berdasarkan metode HTTP
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'];
+    try {
+        $stmt = $pdo->prepare("DELETE FROM menu WHERE id = :id");
+        $stmt->execute(['id' => $id]);
 
-    switch ($action) {
-        case 'add':
-            addProduct($_POST['nama'], $_POST['kategori'], $_POST['harga'], $_POST['status']);
-            break;
-        case 'edit':
-            updateProduct($_POST['id'], $_POST['nama'], $_POST['kategori'], $_POST['harga'], $_POST['status']);
-            break;
-        case 'delete':
-            deleteProduct($_POST['id']);
-            break;
+        // Tambahkan debugging untuk memastikan hasil eksekusi
+        if ($stmt->rowCount() > 0) {
+            return true; // Produk berhasil dihapus
+        } else {
+            return false; // Produk dengan ID tidak ditemukan
+        }
+    } catch (PDOException $e) {
+        // Tangani error database
+        error_log("Error saat menghapus produk: " . $e->getMessage());
+        throw $e; // Opsional: melempar error untuk debugging
     }
-
-    // Redirect kembali ke menu.html setelah operasi
-    header('Location: menu.html');
-    exit;
 }
 
-// Jika metode GET, tampilkan data produk dalam format JSON
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $products = getProducts();
-    header('Content-Type: application/json');
-    echo json_encode($products);
-}
 ?>
