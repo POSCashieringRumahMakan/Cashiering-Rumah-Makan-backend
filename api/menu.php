@@ -47,7 +47,7 @@ switch ($method) {
             }
             break;
         
-            
+
 
         case 'DELETE':
             // Ambil ID dari query parameter atau body JSON
