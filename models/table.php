@@ -23,17 +23,17 @@ class Table {
         return $tables;
     }
 
-    // Menambah meja baru
-    public function addTable($number, $capacity, $status) {
-        $stmt = $this->conn->prepare("INSERT INTO tables (number, capacity, status) VALUES (?, ?, ?)");
-        $stmt->bind_param("sis", $number, $capacity, $status);
+    // Menambah meja baru dengan lokasi
+    public function addTable($number, $capacity, $status, $location) {
+        $stmt = $this->conn->prepare("INSERT INTO tables (number, capacity, status, location) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("siss", $number, $capacity, $status, $location);
         $stmt->execute();
     }
 
-    // Mengupdate meja
-    public function updateTable($id, $number, $capacity, $status) {
-        $stmt = $this->conn->prepare("UPDATE tables SET number = ?, capacity = ?, status = ? WHERE id = ?");
-        $stmt->bind_param("sisi", $number, $capacity, $status, $id);
+    // Mengupdate meja dengan lokasi
+    public function updateTable($id, $number, $capacity, $status, $location) {
+        $stmt = $this->conn->prepare("UPDATE tables SET number = ?, capacity = ?, status = ?, location = ? WHERE id = ?");
+        $stmt->bind_param("sissi", $number, $capacity, $status, $location, $id);
         $stmt->execute();
     }
 

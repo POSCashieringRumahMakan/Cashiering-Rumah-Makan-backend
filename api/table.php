@@ -18,11 +18,11 @@ switch ($method) {
     case 'POST':
         // Menambahkan meja baru dengan status 'tersedia' jika tidak ada status yang diberikan
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->number) && !empty($data->capacity)) {
+        if (!empty($data->number) && !empty($data->capacity) && !empty($data->location)) {
             // Jika status tidak diberikan, defaultkan ke 'tersedia'
             $status = isset($data->status) ? $data->status : 'tersedia';
-            $table->addTable($data->number, $data->capacity, $status);
-            echo json_encode(["message" => "Meja berhasil ditambahkan dengan status '$status'"]);
+            $table->addTable($data->number, $data->capacity, $status, $data->location);
+            echo json_encode(["message" => "Meja berhasil ditambahkan dengan status '$status' dan lokasi '{$data->location}'"]);
         } else {
             echo json_encode(["message" => "Data tidak lengkap"]);
         }
@@ -31,8 +31,8 @@ switch ($method) {
     case 'PUT':
         // Mengupdate meja
         $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->id) && !empty($data->number) && !empty($data->capacity) && !empty($data->status)) {
-            $table->updateTable($data->id, $data->number, $data->capacity, $data->status);
+        if (!empty($data->id) && !empty($data->number) && !empty($data->capacity) && !empty($data->status) && !empty($data->location)) {
+            $table->updateTable($data->id, $data->number, $data->capacity, $data->status, $data->location);
             echo json_encode(["message" => "Meja berhasil diperbarui"]);
         } else {
             echo json_encode(["message" => "Data tidak lengkap"]);
