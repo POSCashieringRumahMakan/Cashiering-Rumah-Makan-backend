@@ -16,16 +16,37 @@ $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
 $pengguna = new Pengguna();
 
+// if ($method === 'POST') {
+//     $data = json_decode(file_get_contents("php://input"));
+
+//     if (empty($data->nama) || empty($data->email) || empty($data->noTelepon) || empty($data->tingkatan)) {
+//         echo json_encode(['message' => 'Semua field harus diisi!']);
+//         http_response_code(400);
+//         exit;
+//     }
+
+//     if ($pengguna->create($data->nama, $data->email, $data->noTelepon, $data->tingkatan)) {
+//         echo json_encode(['message' => 'Pengguna berhasil ditambahkan!']);
+//         http_response_code(201);
+//     } else {
+//         echo json_encode(['message' => 'Terjadi kesalahan, coba lagi.']);
+//         http_response_code(500);
+//     }
+// }
+
 if ($method === 'POST') {
     $data = json_decode(file_get_contents("php://input"));
 
-    if (empty($data->nama) || empty($data->email) || empty($data->noTelepon) || empty($data->tingkatan)) {
+    if (empty($data->nama) || empty($data->email) || empty($data->noTelepon) || empty($data->tingkatan) || empty($data->harga) || empty($data->metode_pembayaran)) {
         echo json_encode(['message' => 'Semua field harus diisi!']);
         http_response_code(400);
         exit;
     }
 
-    if ($pengguna->create($data->nama, $data->email, $data->noTelepon, $data->tingkatan)) {
+    // Tentukan status pembayaran berdasarkan metode pembayaran
+    $status = ($data->metode_pembayaran === 'Dana') ? 'Lunas' : 'Belum Dibayar';
+
+    if ($pengguna->create($data->nama, $data->email, $data->noTelepon, $data->tingkatan, $data->harga, $data->metode_pembayaran, $status)) {
         echo json_encode(['message' => 'Pengguna berhasil ditambahkan!']);
         http_response_code(201);
     } else {
@@ -56,17 +77,46 @@ if ($method === 'GET') {
     }
 }
 
+// if ($method === 'PUT') {
+//     if ($id) {
+//         $data = json_decode(file_get_contents("php://input"));
+
+//         if (empty($data->nama) || empty($data->email) || empty($data->noTelepon) || empty($data->tingkatan)) {
+//             echo json_encode(['message' => 'Semua field harus diisi!']);
+//             http_response_code(400);
+//             exit;
+//         }
+
+//         if ($pengguna->update($id, $data->nama, $data->email, $data->noTelepon, $data->tingkatan)) {
+//             echo json_encode(['message' => 'Pengguna berhasil diperbarui!']);
+//             http_response_code(200);
+//         } else {
+//             echo json_encode(['message' => 'Terjadi kesalahan, coba lagi.']);
+//             http_response_code(500);
+//         }
+//     } else {
+//         echo json_encode(['message' => 'ID pengguna tidak ditemukan.']);
+//         http_response_code(400);
+//     }
+// }
+
 if ($method === 'PUT') {
     if ($id) {
         $data = json_decode(file_get_contents("php://input"));
 
-        if (empty($data->nama) || empty($data->email) || empty($data->noTelepon) || empty($data->tingkatan)) {
-            echo json_encode(['message' => 'Semua field harus diisi!']);
-            http_response_code(400);
-            exit;
+        // Partial update: cek hanya data yang dikirim
+        $fields = [];
+        if (isset($data->nama)) $fields['nama'] = $data->nama;
+        if (isset($data->email)) $fields['email'] = $data->email;
+        if (isset($data->noTelepon)) $fields['noTelepon'] = $data->noTelepon;
+        if (isset($data->tingkatan)) $fields['tingkatan'] = $data->tingkatan;
+        if (isset($data->harga)) $fields['harga'] = $data->harga;
+        if (isset($data->metode_pembayaran)) {
+            $fields['metode_pembayaran'] = $data->metode_pembayaran;
+            $fields['status_pembayaran'] = ($data->metode_pembayaran === 'Dana') ? 'Lunas' : 'Belum Dibayar';
         }
 
-        if ($pengguna->update($id, $data->nama, $data->email, $data->noTelepon, $data->tingkatan)) {
+        if ($pengguna->partialUpdate($id, $fields)) {
             echo json_encode(['message' => 'Pengguna berhasil diperbarui!']);
             http_response_code(200);
         } else {
@@ -78,6 +128,7 @@ if ($method === 'PUT') {
         http_response_code(400);
     }
 }
+
 
 if ($method === 'DELETE') {
     if ($id) {

@@ -4,20 +4,38 @@ require_once '../database/db.php';
 class Pengguna
 {
     // Tambah pengguna baru
-    public function create($nama, $email, $noTelepon, $tingkatan)
+    // public function create($nama, $email, $noTelepon, $tingkatan)
+    // {
+    //     global $pdo;
+    
+    //     $query = "INSERT INTO pengguna (nama, email, noTelepon, tingkatan) VALUES (:nama, :email, :noTelepon, :tingkatan)";
+    //     $stmt = $pdo->prepare($query);
+    //     return $stmt->execute([
+    //         ':nama' => $nama,
+    //         ':email' => $email,
+    //         ':noTelepon' => $noTelepon,
+    //         ':tingkatan' => $tingkatan
+    //     ]);
+    // }
+    
+    // Tambah pengguna baru dengan harga & metode pembayaran
+    public function create($nama, $email, $noTelepon, $tingkatan, $harga, $metodePembayaran, $status)
     {
         global $pdo;
     
-        $query = "INSERT INTO pengguna (nama, email, noTelepon, tingkatan) VALUES (:nama, :email, :noTelepon, :tingkatan)";
+        $query = "INSERT INTO pengguna (nama, email, noTelepon, tingkatan, harga, metode_pembayaran, status) 
+                  VALUES (:nama, :email, :noTelepon, :tingkatan, :harga, :metodePembayaran, :status)";
         $stmt = $pdo->prepare($query);
         return $stmt->execute([
             ':nama' => $nama,
             ':email' => $email,
             ':noTelepon' => $noTelepon,
-            ':tingkatan' => $tingkatan
+            ':tingkatan' => $tingkatan,
+            ':harga' => $harga,
+            ':metodePembayaran' => $metodePembayaran,
+            ':status' => $status
         ]);
     }
-    
 
     // Ambil semua pengguna
     public function getAll()
@@ -42,13 +60,55 @@ class Pengguna
     }
 
     // Update pengguna
-    public function update($id, $nama, $email, $noTelepon, $tingkatan)
+//     public function update($id, $nama, $email, $noTelepon, $tingkatan)
+// {
+//     global $pdo;
+
+//     $query = "UPDATE pengguna SET nama = ?, email = ?, noTelepon = ?, tingkatan = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?";
+//     $stmt = $pdo->prepare($query);
+//     return $stmt->execute([$nama, $email, $noTelepon, $tingkatan, $id]);    
+// }
+
+// Update pengguna
+public function update($id, $nama, $email, $noTelepon, $tingkatan, $harga, $metodePembayaran, $status)
 {
     global $pdo;
 
-    $query = "UPDATE pengguna SET nama = ?, email = ?, noTelepon = ?, tingkatan = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?";
+    $query = "UPDATE pengguna 
+              SET nama = ?, email = ?, noTelepon = ?, tingkatan = ?, harga = ?, metode_pembayaran = ?, status = ?, created_at = CURRENT_TIMESTAMP 
+              WHERE id = ?";
     $stmt = $pdo->prepare($query);
-    return $stmt->execute([$nama, $email, $noTelepon, $tingkatan, $id]);    
+    return $stmt->execute([$nama, $email, $noTelepon, $tingkatan, $harga, $metodePembayaran, $status, $id]);    
+}
+
+public function partialUpdate($id, $fields)
+{
+    global $pdo;
+
+    $setClause = [];
+    $params = [];
+
+    foreach ($fields as $key => $value) {
+        $setClause[] = "$key = :$key";
+        $params[":$key"] = $value;
+    }
+
+    if (empty($setClause)) {
+        return false;
+    }
+
+    $params[":id"] = $id;
+    $query = "UPDATE pengguna SET " . implode(", ", $setClause) . " WHERE id = :id";
+    $stmt = $pdo->prepare($query);
+
+    if ($stmt->execute($params)) {
+        return true;
+    } else {
+        // Tampilkan error jika gagal
+        $errorInfo = $stmt->errorInfo();
+        error_log("Gagal update: " . $errorInfo[2]);
+        return false;
+    }
 }
 
 
