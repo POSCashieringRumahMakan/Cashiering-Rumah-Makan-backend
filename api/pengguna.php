@@ -113,8 +113,29 @@ if ($method === 'PUT') {
         if (isset($data->harga)) $fields['harga'] = $data->harga;
         if (isset($data->metode_pembayaran)) {
             $fields['metode_pembayaran'] = $data->metode_pembayaran;
-            $fields['status_pembayaran'] = ($data->metode_pembayaran === 'Dana') ? 'Lunas' : 'Belum Dibayar';
+        
+            // Jika metode pembayaran Dana, langsung lunas
+            if ($data->metode_pembayaran === 'Dana') {
+                $fields['status'] = 'Lunas';
+            } 
+            // Jika Cash, cek apakah ada konfirmasi pembayaran
+            elseif ($data->metode_pembayaran === 'Cash' && isset($data->pembayaran_berhasil) && $data->pembayaran_berhasil) {
+                $fields['status'] = 'Lunas';
+            }            
+            // Jika metode Cash tapi belum dikonfirmasi, tetap "Belum Dibayar"
+            else {
+                $fields['status'] = 'Belum Dibayar';
+            }
         }
+
+        if ($pengguna->partialUpdate($id, $fields)) {
+            echo json_encode(['message' => 'Status pembayaran berhasil diperbarui!']);
+            http_response_code(200);
+        } else {
+            echo json_encode(['message' => 'Gagal memperbarui status pembayaran.']);
+            http_response_code(500);
+        }
+        
 
         if ($pengguna->partialUpdate($id, $fields)) {
             echo json_encode(['message' => 'Pengguna berhasil diperbarui!']);

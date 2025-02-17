@@ -81,6 +81,37 @@ public function update($id, $nama, $email, $noTelepon, $tingkatan, $harga, $meto
     return $stmt->execute([$nama, $email, $noTelepon, $tingkatan, $harga, $metodePembayaran, $status, $id]);    
 }
 
+// public function partialUpdate($id, $fields)
+// {
+//     global $pdo;
+
+//     $setClause = [];
+//     $params = [];
+
+//     foreach ($fields as $key => $value) {
+//         $setClause[] = "$key = :$key";
+//         $params[":$key"] = $value;
+//     }
+
+//     if (empty($setClause)) {
+//         return false;
+//     }
+
+//     $params[":id"] = $id;
+//     $query = "UPDATE pengguna SET " . implode(", ", $setClause) . " WHERE id = :id";
+//     $stmt = $pdo->prepare($query);
+
+//     if ($stmt->execute($params)) {
+//         return true;
+//     } else {
+//         // Tampilkan error jika gagal
+//         $errorInfo = $stmt->errorInfo();
+//         error_log("Gagal update: " . $errorInfo[2]);
+//         return false;
+//     }
+// }
+
+
 public function partialUpdate($id, $fields)
 {
     global $pdo;
@@ -102,15 +133,14 @@ public function partialUpdate($id, $fields)
     $stmt = $pdo->prepare($query);
 
     if ($stmt->execute($params)) {
+        error_log("Update berhasil: " . json_encode($fields)); // Tambahkan log
         return true;
     } else {
-        // Tampilkan error jika gagal
         $errorInfo = $stmt->errorInfo();
-        error_log("Gagal update: " . $errorInfo[2]);
+        error_log("Gagal update: " . $errorInfo[2]); // Tambahkan log error
         return false;
     }
 }
-
 
     // Hapus pengguna
     public function delete($id)
