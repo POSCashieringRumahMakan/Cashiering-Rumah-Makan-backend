@@ -59,16 +59,6 @@ class Pengguna
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Update pengguna
-//     public function update($id, $nama, $email, $noTelepon, $tingkatan)
-// {
-//     global $pdo;
-
-//     $query = "UPDATE pengguna SET nama = ?, email = ?, noTelepon = ?, tingkatan = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?";
-//     $stmt = $pdo->prepare($query);
-//     return $stmt->execute([$nama, $email, $noTelepon, $tingkatan, $id]);    
-// }
-
 // Update pengguna
 public function update($id, $nama, $email, $noTelepon, $tingkatan, $harga, $metodePembayaran, $status)
 {
