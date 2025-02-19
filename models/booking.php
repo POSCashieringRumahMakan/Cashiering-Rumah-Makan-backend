@@ -23,6 +23,38 @@ class Booking {
         return $bookings;
     }
 
+    // Ambil data booking hari ini
+    public function getBookingsToday() {
+        $today = date("Y-m-d");
+        $query = "SELECT * FROM bookings WHERE DATE(booking_time) = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $today);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $bookings = [];
+        while ($row = $result->fetch_assoc()) {
+            $bookings[] = $row;
+        }
+        return $bookings;
+    }
+
+    // Ambil data booking besok
+    public function getBookingsTomorrow() {
+        $tomorrow = date("Y-m-d", strtotime("+1 day"));
+        $query = "SELECT * FROM bookings WHERE DATE(booking_time) = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $tomorrow);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $bookings = [];
+        while ($row = $result->fetch_assoc()) {
+            $bookings[] = $row;
+        }
+        return $bookings;
+    }
+
     // Tambah booking baru
     public function addBooking($table_id, $customer_name, $booking_time) {
         // Cek apakah meja tersedia pada waktu tersebut

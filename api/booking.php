@@ -10,9 +10,24 @@ $booking = new Booking();
 
 switch ($method) {
     case 'GET':
-        // Menampilkan semua booking
-        header('Content-Type: application/json');
-        echo json_encode($booking->getAllBookings());
+        // Menampilkan semua booking atau berdasarkan filter
+        if (isset($_GET['filter'])) {
+            $filter = $_GET['filter'];
+
+            if ($filter == 'today') {
+                header('Content-Type: application/json');
+                echo json_encode($booking->getBookingsToday());
+            } elseif ($filter == 'tomorrow') {
+                header('Content-Type: application/json');
+                echo json_encode($booking->getBookingsTomorrow());
+            } else {
+                header('Content-Type: application/json');
+                echo json_encode($booking->getAllBookings());
+            }
+        } else {
+            header('Content-Type: application/json');
+            echo json_encode($booking->getAllBookings());
+        }
         break;
 
     case 'POST':
@@ -54,4 +69,3 @@ switch ($method) {
         }
         break;
 }
-?>
